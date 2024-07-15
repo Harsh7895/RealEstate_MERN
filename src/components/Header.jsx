@@ -1,8 +1,10 @@
 // eslint-disable-next-line no-unused-vars
 import { FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function Header() {
+  const { currentUser } = useSelector((state) => state.user);
   return (
     <header className="bg-slate-200 shadow-md">
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
@@ -29,7 +31,17 @@ export default function Header() {
             <Link to={"/about"}>About</Link>
           </li>
           <li className="text-slate-700 hover:text-slate-500 hover:underline cursor-pointer">
-            <Link to={"/sign-in"}>Sign In</Link>
+            <Link to={"/profile"}>
+              {currentUser ? (
+                <img
+                  src={currentUser.avatar}
+                  alt="Profile"
+                  className="w-7 h-7 rounded-full"
+                />
+              ) : (
+                <span>Sign In</span>
+              )}
+            </Link>
           </li>
         </ul>
       </div>

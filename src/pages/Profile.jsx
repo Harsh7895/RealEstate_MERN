@@ -12,8 +12,14 @@ import {
   updateUserStart,
   updateUserSuccess,
   updateUserFailure,
+  deleteUserStart,
+  deleteUserFailure,
+  deleteUserSuccess,
+  signOutUserFailure,
+  signOutUserStart,
+  signOutUserSuccess,
 } from "../../redux/user/userSlice";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function Profile() {
   const fileRef = useRef(null);
@@ -24,7 +30,6 @@ export default function Profile() {
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   // firebase storage
   // allow read;
@@ -86,13 +91,46 @@ export default function Profile() {
 
       dispatch(updateUserSuccess(data));
       setUpdateSuccess(true);
-      navigate("/");
     } catch (error) {
       dispatch(updateUserFailure(error.message));
     }
   };
 
-  // console.log("formData", formData);
+  const handleUserDelete = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+
+      dispatch(deleteUserSuccess());
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
+    }
+  };
+
+  const handleSignOutUser = async () => {
+    try {
+      dispatch(signOutUserStart());
+      const res = await fetch("/api/auth/sign-out", {
+        method: "GET",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(signOutUserFailure(data.message));
+        return;
+      }
+      dispatch(signOutUserSuccess());
+    } catch (error) {
+      dispatch(signOutUserFailure(error.message));
+    }
+  };
+
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
@@ -152,10 +190,26 @@ export default function Profile() {
         >
           {loading ? "Updating..." : "Update"}
         </button>
+        <Link
+          to={"/create-listing"}
+          className="bg-green-600 text-white uppercase text-center p-3 rounded-lg hover:opacity-95"
+        >
+          create Listing
+        </Link>
       </form>
       <div className="flex justify-between mt-5">
-        <span className="text-red-700 cursor-pointer">Delete account</span>
-        <span className="text-red-700 cursor-pointer">Sign out</span>
+        <span
+          className="text-red-700 cursor-pointer"
+          onClick={handleUserDelete}
+        >
+          Delete account
+        </span>
+        <span
+          className="text-red-700 cursor-pointer"
+          onClick={handleSignOutUser}
+        >
+          Sign out
+        </span>
       </div>
 
       <p className="mt-5 text-red-700">{error ? error : ""}</p>

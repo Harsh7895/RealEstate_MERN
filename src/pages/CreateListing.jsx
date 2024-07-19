@@ -35,6 +35,7 @@ export default function CreateListing() {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
       const promises = [];
       setUploading(true);
+      setError(null);
 
       for (let i = 0; i < files.length; i++) {
         promises.push(storeImage(files[i]));
@@ -113,10 +114,12 @@ export default function CreateListing() {
 
     if (formData.imageUrls.length < 2) {
       setError("There must be more than two images to create a listing.");
+      setLoading(false);
       return;
     }
-    if (+formData.regularPrice > +formData.discountPrice) {
+    if (+formData.regularPrice < +formData.discountPrice) {
       setError("Discount price must be lower than discounted price.");
+      setLoading(false);
       return;
     }
 

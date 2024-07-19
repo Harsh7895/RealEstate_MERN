@@ -29,6 +29,8 @@ export default function Profile() {
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [showListingError, setShowListingError] = useState(false);
+  const [listings, setListings] = useState([]);
   const dispatch = useDispatch();
 
   // firebase storage
@@ -131,8 +133,42 @@ export default function Profile() {
     }
   };
 
+  const handleShowListings = async () => {
+    try {
+      const res = await fetch(`/api/user/listing/${currentUser._id}`, {
+        method: "GET",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        setShowListingError(true);
+      }
+      setListings(data);
+    } catch (error) {
+      setShowListingError(true);
+    }
+  };
+
+  const handleDeleteListing = async (listingId) => {
+    try {
+      const res = await fetch(`/api/listing/${listingId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        console.log(data.message);
+        return;
+      }
+
+      setListings((prev) =>
+        prev.filter((listing) => listing._id !== listingId)
+      );
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
   return (
-    <div className="p-3 max-w-lg mx-auto">
+    <div className="p-3 max-w-lg mx-auto mb-8">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <input
@@ -216,6 +252,51 @@ export default function Profile() {
       <p className="mt-5 text-green-700">
         {updateSuccess ? "User is Updated" : ""}
       </p>
+
+      <button
+        className="text-green-700 uppercase w-full"
+        onClick={handleShowListings}
+      >
+        Show Listing
+      </button>
+
+      {listings && listings.length > 0 && (
+        <div className="flex flex-col gap-4">
+          <h1 className="text-center text-2xl mt-10 font-semibold">
+            Your Listings
+          </h1>
+
+          {listings.map((listing) => (
+            <div
+              key={listing._id}
+              className="p-3 flex justify-between items-center border rounded-lg"
+            >
+              <Link to={`/listing/${listing._id}`}>
+                <img
+                  src={listing.imageUrls[0]}
+                  alt="Listing cover"
+                  className="h-20 w-20 object-contain"
+                />
+              </Link>
+              <Link to={`/listing/${listing._id}`}>
+                <p>{listing.name}</p>
+              </Link>
+
+              <div className="flex flex-col items-center">
+                <button
+                  className="text-red-700 uppercase hover:opacity-85"
+                  onClick={() => handleDeleteListing(listing._id)}
+                >
+                  Delete
+                </button>
+                <button className="text-green-700 uppercase hover:opacity-85">
+                  Edit
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -4,11 +4,10 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
-export default function CreateListing() {
+export default function UpdateListing() {
   const [files, setFiles] = useState([]);
   const [formData, setFormData] = useState({
     imageUrls: [],
@@ -28,8 +27,7 @@ export default function CreateListing() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { currentUser } = useSelector((state) => state.user);
-  const navigate = useNavigate();
+  const params = useParams();
 
   const handleImageUpload = () => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
@@ -108,55 +106,70 @@ export default function CreateListing() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    if (formData.imageUrls.length < 2) {
-      setError("There must be more than two images to create a listing.");
-      setLoading(false);
-      return;
-    }
-    if (+formData.regularPrice < +formData.discountPrice) {
-      setError("Discount price must be lower than discounted price.");
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const res = await fetch("/api/listing/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ ...formData, userRef: currentUser._id }),
-      });
-
-      const data = await res.json();
-      setLoading(false);
-      if (data.success === false) {
-        setError(data.message);
+  useEffect(() => {
+    const getAListing = async () => {
+      try {
+        const listing = await fetch(`/api/listing/getAlisting/${params.id}`, {
+          method: "GET",
+        });
+        const data = await listing.json();
+        if (data.success === false) {
+          return;
+        }
+        setFormData(data);
+      } catch (error) {
+        return;
       }
-      navigate(`/profile`);
-    } catch (err) {
-      setLoading(false);
-      setError(err.message);
-    }
-  };
+    };
+
+    getAListing();
+  }, [params.id]);
 
   const handleImageDelete = (url) => {
+    if (formData.imageUrls.length < 3) {
+      setImageUploadError("There can't be lesser than 2 images !!");
+      return;
+    }
     setFormData((prev) => ({
       ...prev,
       imageUrls: prev.imageUrls.filter((imageUrl) => imageUrl !== url),
     }));
   };
 
+  const handleUpdateListing = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/listing/update/${params.id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      setLoading(false);
+      if (data.success === false) {
+        setError(data.message);
+        return;
+      }
+      setFormData(data);
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="p-3 max-w-4xl mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">
-        Create a Listing
+        Update a Listing
       </h1>
-      <form className="flex flex-col sm:flex-row gap-4" onSubmit={handleSubmit}>
+      <form
+        className="flex flex-col sm:flex-row gap-4"
+        onSubmit={handleUpdateListing}
+      >
         <div className="flex flex-col gap-4 flex-1">
           <input
             type="text"
@@ -343,8 +356,8 @@ export default function CreateListing() {
                   className="w-20 h-20 object-cover rounded-lg"
                 />
                 <button
-                  className="uppercase text-red-700 hover:opacity-75 font-bold p-3"
                   type="button"
+                  className="uppercase text-red-700 hover:opacity-75 font-bold p-3"
                   onClick={() => handleImageDelete(url)}
                 >
                   Delete
@@ -356,7 +369,7 @@ export default function CreateListing() {
             disabled={loading || uploading}
             className="p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
           >
-            {loading ? "Creating ..." : "Create Listing"}
+            {loading ? "Updating ..." : "Update Listing"}
           </button>
           <p className="text-red-700 text-sm">{error && error}</p>
         </div>

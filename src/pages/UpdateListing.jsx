@@ -5,7 +5,7 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 export default function UpdateListing() {
   const [files, setFiles] = useState([]);
@@ -28,6 +28,7 @@ export default function UpdateListing() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const params = useParams();
+  const navigate = useNavigate();
 
   const handleImageUpload = () => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
@@ -155,6 +156,7 @@ export default function UpdateListing() {
         return;
       }
       setFormData(data);
+      navigate("/profile");
     } catch (error) {
       setError(error);
       setLoading(false);

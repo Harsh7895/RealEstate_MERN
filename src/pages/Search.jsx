@@ -5,6 +5,8 @@ export default function Search() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [listings, setListings] = useState([]);
+  const [showMore, setShowMore] = useState(false);
+
   const [sidebarData, setSidebarData] = useState({
     searchTerm: "",
     type: "all",
@@ -14,8 +16,6 @@ export default function Search() {
     sort: "createdAt",
     order: "desc",
   });
-
-  console.log(listings);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -50,9 +50,15 @@ export default function Search() {
     const fetchListings = async () => {
       try {
         setLoading(true);
+        setShowMore(false);
         const searchQuery = urlParams.toString();
         const res = await fetch(`/api/listing/get?${searchQuery}`);
         const data = await res.json();
+        if (data.length > 8) {
+          setShowMore(true);
+        } else {
+          setShowMore(false);
+        }
         setLoading(false);
         if (data.success === false) {
           console.log(data.message);
@@ -111,6 +117,19 @@ export default function Search() {
 
     const searchquery = urlParams.toString();
     navigate(`/search?${searchquery}`);
+  };
+
+  const onShowMoreClick = async () => {
+    const numberOfListings = listings.length;
+    const startIndex = numberOfListings;
+    const urlParams = new URLSearchParams(location.search);
+    urlParams.set("startIndex", startIndex);
+    const searchQuery = urlParams.toString();
+    const res = await fetch(`/api/listing?${searchQuery}`);
+    const data = res.json();
+    if (data.length < 9) setShowMore(false);
+
+    setListings([...listings, ...data]);
   };
 
   return (
@@ -250,6 +269,15 @@ export default function Search() {
               <ListingItem key={listing._id} listing={listing} />
             ))}
         </div>
+
+        {showMore && (
+          <button
+            onClick={onShowMoreClick}
+            className="text-green-700 hover:underline w-full text-center"
+          >
+            Show more
+          </button>
+        )}
       </div>
     </div>
   );

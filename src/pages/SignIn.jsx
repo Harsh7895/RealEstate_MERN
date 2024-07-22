@@ -21,6 +21,7 @@ export default function SignIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(formData);
     try {
       dispatch(signInStart());
       const res = await fetch("/api/auth/sign-in", {
@@ -31,6 +32,7 @@ export default function SignIn() {
         body: JSON.stringify(formData),
       });
       const Data = await res.json();
+      console.log(data);
       if (Data.success === false) {
         dispatch(signInFailure(Data.message));
         setFormData(data);
@@ -76,7 +78,7 @@ export default function SignIn() {
           disabled={loading}
           className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
         >
-          {loading ? "Loading ..." : "Sign Up"}
+          {loading ? "Loading ..." : "Sign In"}
         </button>
         <Oauth />
       </form>

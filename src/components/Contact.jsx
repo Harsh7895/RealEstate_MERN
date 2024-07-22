@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function Contact({ listing }) {
-  console.log(listing);
   const [listingOwner, setListingOwner] = useState(null);
   const [message, setmessage] = useState("");
   const userId = listing.userRef;
@@ -14,7 +13,6 @@ export default function Contact({ listing }) {
         });
         const data = await res.json();
         if (data.success === false) {
-          console.log(data.message);
           return;
         }
         setListingOwner(data);

@@ -9,7 +9,6 @@ export default defineConfig({
         target: "https://harsh-estate-mern-api.vercel.app",
         changeOrigin: true,
         secure: false,
-        rewrites: [{ source: "/(.*)", destination: "/" }],
       },
     },
   },

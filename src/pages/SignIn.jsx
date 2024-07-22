@@ -21,7 +21,6 @@ export default function SignIn() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
     try {
       dispatch(signInStart());
       const res = await fetch(
@@ -34,21 +33,27 @@ export default function SignIn() {
           body: JSON.stringify(formData),
         }
       );
-      const Data = await res.json();
-      console.log(data);
-      if (Data.success === false) {
-        dispatch(signInFailure(Data.message));
-        setFormData(data);
+      const data = await res.json();
+      console.log(data); // Log the response to check what the API returns
 
+      if (!res.ok) {
+        // Handle non-successful response (HTTP status not in 200-299 range)
+        throw new Error(data.message || "Failed to sign in");
+      }
+
+      if (data.success === false) {
+        dispatch(signInFailure(data.message)); // Handle server-side errors
+        setFormData(data); // Reset form data or handle error state
         return;
       }
 
-      dispatch(signInSuccess(Data));
-      setFormData(data);
-      navigate("/");
+      dispatch(signInSuccess(data)); // Dispatch action for successful sign-in
+      setFormData({ email: "", password: "" }); // Reset form fields
+      navigate("/"); // Redirect to home or desired page after successful sign-in
     } catch (error) {
-      dispatch(signInFailure(error));
-      setFormData(data);
+      console.error("Sign-in error:", error);
+      dispatch(signInFailure(error.message || "Failed to sign in"));
+      setFormData({ email: "", password: "" }); // Reset form fields on error
     }
   };
 

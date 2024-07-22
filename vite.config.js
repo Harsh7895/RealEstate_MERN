@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://harsh-estate-api.vercel.app",
+        target: "https://harsh-estate-mern-api.vercel.app",
         changeOrigin: true,
         secure: false,
       },

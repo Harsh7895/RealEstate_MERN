@@ -24,13 +24,16 @@ export default function SignIn() {
     console.log(formData);
     try {
       dispatch(signInStart());
-      const res = await fetch("/api/auth/sign-in", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const res = await fetch(
+        "https://harsh-estate-mern-api.vercel.app/api/auth/sign-in",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }
+      );
       const Data = await res.json();
       console.log(data);
       if (Data.success === false) {

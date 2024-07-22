@@ -28,7 +28,9 @@ export default function Listing() {
     const fetchListing = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`/api/listing/getAlisting/${params.listingId}`);
+        const res = await fetch(
+          `https://harsh-estate-mern-api.vercel.app/api/listing/getAlisting/${params.listingId}`
+        );
         const data = await res.json();
         if (data.success === false) {
           setError(true);

@@ -34,12 +34,6 @@ export default function SignIn() {
         }
       );
       const data = await res.json();
-      console.log(data); // Log the response to check what the API returns
-
-      if (!res.ok) {
-        // Handle non-successful response (HTTP status not in 200-299 range)
-        throw new Error(data.message || "Failed to sign in");
-      }
 
       if (data.success === false) {
         dispatch(signInFailure(data.message)); // Handle server-side errors

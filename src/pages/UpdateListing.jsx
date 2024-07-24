@@ -110,12 +110,9 @@ export default function UpdateListing() {
   useEffect(() => {
     const getAListing = async () => {
       try {
-        const listing = await fetch(
-          `https://harsh-estate-mern-api.vercel.app/api/listing/getAlisting/${params.id}`,
-          {
-            method: "GET",
-          }
-        );
+        const listing = await fetch(`/api/listing/getAlisting/${params.id}`, {
+          method: "GET",
+        });
         const data = await listing.json();
         if (data.success === false) {
           return;
@@ -144,16 +141,13 @@ export default function UpdateListing() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch(
-        `https://harsh-estate-mern-api.vercel.app/api/listing/update/${params.id}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const res = await fetch(`/api/listing/update/${params.id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
 
       const data = await res.json();
       setLoading(false);

@@ -8,12 +8,9 @@ export default function Contact({ listing }) {
   useEffect(() => {
     const getListingOwner = async () => {
       try {
-        const res = await fetch(
-          `https://harsh-estate-mern-api.vercel.app/api/user/${userId}`,
-          {
-            method: "GET",
-          }
-        );
+        const res = await fetch(`/api/user/${userId}`, {
+          method: "GET",
+        });
         const data = await res.json();
         if (data.success === false) {
           return;

@@ -52,7 +52,9 @@ export default function Search() {
         setLoading(true);
         setShowMore(false);
         const searchQuery = urlParams.toString();
-        const res = await fetch(`/api/listing/get?${searchQuery}`);
+        const res = await fetch(
+          `https://harsh-estate-mern-api.vercel.app/api/listing/get?${searchQuery}`
+        );
         const data = await res.json();
         if (data.length > 8) {
           setShowMore(true);
@@ -125,7 +127,9 @@ export default function Search() {
     const urlParams = new URLSearchParams(location.search);
     urlParams.set("startIndex", startIndex);
     const searchQuery = urlParams.toString();
-    const res = await fetch(`/api/listing?${searchQuery}`);
+    const res = await fetch(
+      `https://harsh-estate-mern-api.vercel.app/api/listing?${searchQuery}`
+    );
     const data = res.json();
     if (data.length < 9) setShowMore(false);
 
